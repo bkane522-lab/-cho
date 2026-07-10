@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
       if (resp.status === 401) {
         return res.status(500).json({ error: 'Clé API Groq invalide' });
       }
-      return res.status(500).json({ error: "Échec de l'extraction IA" });
+      return res.status(500).json({ error: "Échec de l'analyse" });
     }
 
     const data = await resp.json();
@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
       console.error('JSON non parsable reçu du modèle:', raw.slice(0, 500));
       return res.status(200).json({
         title: null,
-        summary: raw.slice(0, 400) || 'Résumé indisponible — réponse IA invalide.',
+        summary: raw.slice(0, 400) || 'Résumé indisponible — réponse invalide, réessayez.',
         tasks: [],
         decisions: [],
         deadlines: []
