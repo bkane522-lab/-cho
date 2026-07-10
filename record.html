@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Écho — Enregistrement</title>
+<meta name="theme-color" content="#E8734A">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+  <button class="back-btn" onclick="location.href='/index.html'">← Accueil</button>
+
+  <div id="unsupportedUI" class="card" style="display:none;">
+    <div style="color: var(--coral); font-weight: 600; margin-bottom: 8px;">Enregistrement non disponible</div>
+    <div style="font-size: 14px; color: var(--ink-soft);">Ton navigateur ne supporte pas l'enregistrement audio (MediaRecorder). Essaie Chrome sur Android, ou importe un fichier audio déjà enregistré depuis l'accueil.</div>
+  </div>
+
+  <div id="liveUI" style="display:none;">
+    <div class="rec-status" id="recStatus">Prêt à enregistrer</div>
+    <button class="record-pulse" id="pulseBtn" aria-label="Démarrer l'enregistrement">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
+    </button>
+    <div class="timer" id="timer">00:00</div>
+    <div id="warningBanner"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
+      <button class="btn btn-primary" id="stopBtn" style="display:none;">Terminer</button>
+    </div>
+  </div>
+
+  <div id="importUI" style="display:none;">
+    <div class="card">
+      <div style="font-weight:600; margin-bottom: 8px;">Fichier importé</div>
+      <div id="importFileName" style="color: var(--ink-soft); font-size: 14px; margin-bottom: 4px;"></div>
+      <div id="importFileSize" style="color: var(--ink-soft); font-size: 12px; margin-bottom: 16px;"></div>
+      <div id="importSizeError" style="display:none;"></div>
+      <button class="btn btn-primary" id="processImportBtn">Lancer l'analyse</button>
+    </div>
+  </div>
+
+  <div id="loadingUI" class="loading-state" style="display:none;">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Transcription en cours…</div>
+  </div>
+
+  <div id="errorUI" class="card" style="display:none;">
+    <div style="color: var(--coral); font-weight: 600; margin-bottom: 8px;">Une erreur est survenue</div>
+    <div id="errorMsg" style="font-size: 14px; color: var(--ink-soft); margin-bottom: 16px;"></div>
+    <button class="btn btn-secondary" onclick="location.href='/index.html'">Retour à l'accueil</button>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+<script src="/record.js"></script>
+</body>
+</html>
