@@ -24,6 +24,7 @@ const unsupportedUI = document.getElementById('unsupportedUI');
 
 let mediaRecorder, stream, seconds = 0, timerInterval, isPaused = false;
 let transcriptParts = [];
+let pendingTranscriptions = [];
 
 function showError(msg) {
   liveUI.style.display = 'none';
@@ -133,15 +134,20 @@ if (mode === 'live') {
         return;
       }
 
-      mediaRecorder.ondataavailable = async (e) => {
+      mediaRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
-          try {
-            const base64 = await blobToBase64(e.data);
-            const text = await transcribeBase64(base64);
-            transcriptParts.push(text);
-          } catch (err) {
-            console.error('Segment ignoré :', err.message);
-          }
+          const idx = transcriptParts.length;
+          transcriptParts.push(''); // réserve la place pour garder l'ordre
+          const task = (async () => {
+            try {
+              const base64 = await blobToBase64(e.data);
+              const text = await transcribeBase64(base64);
+              transcriptParts[idx] = text;
+            } catch (err) {
+              console.error('Segment ignoré :', err.message);
+            }
+          })();
+          pendingTranscriptions.push(task);
         }
       };
 
@@ -171,16 +177,23 @@ if (mode === 'live') {
     function stopRecording() {
       clearInterval(timerInterval);
       statusEl.textContent = 'Arrêt en cours…';
+      showLoading('Finalisation de la transcription…');
+
+      const finish = async () => {
+        if (stream) stream.getTracks().forEach((t) => t.stop());
+        // Attend que TOUS les segments audio soient transcrits avant de continuer,
+        // même si l'appel réseau vers Groq Whisper prend plusieurs secondes.
+        await Promise.all(pendingTranscriptions);
+        await finalizeSession(transcriptParts.join(' ').trim());
+      };
+
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.onstop = finish;
         try { mediaRecorder.requestData(); } catch {}
         mediaRecorder.stop();
+      } else {
+        finish();
       }
-      if (stream) stream.getTracks().forEach((t) => t.stop());
-
-      setTimeout(async () => {
-        showLoading('Finalisation de la transcription…');
-        await finalizeSession(transcriptParts.join(' ').trim());
-      }, 600);
     }
 
     pulseBtn.addEventListener('click', startRecording);
