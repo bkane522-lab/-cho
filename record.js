@@ -1,15 +1,9 @@
 // ============================================================
 // Écho — record.js
-// Choix technique : audio envoyé en base64 (pas FormData) car les
-// fonctions serverless Vercel en CommonJS simple ne parsent pas le
-// multipart sans dépendance supplémentaire (formidable/busboy).
-// Le base64 gonfle la taille d'environ +33% : on limite donc le
-// fichier réel à ~3 Mo pour rester sous la limite dure de 4,5 Mo
-// par requête de Vercel une fois encodé.
 // ============================================================
 
-const MAX_REAL_BYTES = 3 * 1024 * 1024; // 3 Mo réels
-const CHUNK_INTERVAL_MS = 4 * 60 * 1000; // 4 min par segment en live
+const MAX_REAL_BYTES = 3 * 1024 * 1024;
+const CHUNK_INTERVAL_MS = 4 * 60 * 1000;
 const HARD_LIMIT_S = 30 * 60;
 const WARNING_S = 25 * 60;
 
@@ -25,6 +19,7 @@ const unsupportedUI = document.getElementById('unsupportedUI');
 let mediaRecorder, stream, seconds = 0, timerInterval, isPaused = false;
 let transcriptParts = [];
 let pendingTranscriptions = [];
+let segmentErrors = [];
 
 function showError(msg) {
   liveUI.style.display = 'none';
@@ -77,7 +72,11 @@ async function extractFromTranscript(transcript) {
 
 async function finalizeSession(fullTranscript) {
   if (!fullTranscript || fullTranscript.trim().length < 3) {
-    showError("Aucune parole n'a pu être transcrite. Réessaie dans un environnement plus calme.");
+    if (segmentErrors.length > 0) {
+      showError('Échec de la transcription : ' + segmentErrors[0]);
+    } else {
+      showError("Aucune parole n'a pu être transcrite. Réessaie dans un environnement plus calme.");
+    }
     return;
   }
   showLoading('Extraction des tâches, décisions et échéances…');
@@ -114,6 +113,9 @@ if (mode === 'live') {
     const warningBanner = document.getElementById('warningBanner');
 
     async function startRecording() {
+      transcriptParts = [];
+      pendingTranscriptions = [];
+      segmentErrors = [];
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch {
@@ -137,7 +139,7 @@ if (mode === 'live') {
       mediaRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
           const idx = transcriptParts.length;
-          transcriptParts.push(''); // réserve la place pour garder l'ordre
+          transcriptParts.push('');
           const task = (async () => {
             try {
               const base64 = await blobToBase64(e.data);
@@ -145,6 +147,7 @@ if (mode === 'live') {
               transcriptParts[idx] = text;
             } catch (err) {
               console.error('Segment ignoré :', err.message);
+              segmentErrors.push(err.message);
             }
           })();
           pendingTranscriptions.push(task);
@@ -181,8 +184,6 @@ if (mode === 'live') {
 
       const finish = async () => {
         if (stream) stream.getTracks().forEach((t) => t.stop());
-        // Attend que TOUS les segments audio soient transcrits avant de continuer,
-        // même si l'appel réseau vers Groq Whisper prend plusieurs secondes.
         await Promise.all(pendingTranscriptions);
         await finalizeSession(transcriptParts.join(' ').trim());
       };
