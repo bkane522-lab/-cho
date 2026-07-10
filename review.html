@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Écho — Résultat</title>
 <meta name="theme-color" content="#E8734A">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<div class="container">
+<div class="container with-sticky-bar">
   <button class="back-btn" onclick="location.href='/index.html'">← Accueil</button>
-  <h1 id="sessionTitle" contenteditable="true" style="font-size:20px; margin-bottom:4px;"></h1>
-  <div class="session-date" id="sessionDate" style="margin-bottom:20px;"></div>
-
-  <div class="disclaimer">Vérifiez les résultats avant de les envoyer — l'IA peut se tromper.</div>
+  <h1 id="sessionTitle" contenteditable="true" style="font-size:19px; margin-bottom:2px;"></h1>
+  <div class="session-date" id="sessionDate" style="margin-bottom:14px;"></div>
 
   <div class="card">
-    <div style="font-weight:600; margin-bottom:8px;">Résumé</div>
+    <div style="font-weight:600; margin-bottom:6px; font-size:14px;">Résumé</div>
     <div class="summary-box" id="summaryText" contenteditable="true"></div>
   </div>
 
@@ -34,19 +34,35 @@
       <button class="add-item-btn" id="addItemBtn">+</button>
     </div>
   </div>
+</div>
 
-  <div class="btn-row">
-    <button class="btn btn-primary" id="saveBtn">Sauvegarder dans l'historique</button>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" id="exportBtn">Exporter</button>
-    <button class="btn btn-secondary" id="shareBtn">Partager</button>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" onclick="location.href='/record.html?mode=live'">Nouvelle réunion</button>
-  </div>
-  <div class="btn-row" id="deleteRow" style="display:none;">
-    <button class="btn btn-secondary btn-danger" id="deleteBtn">Supprimer cette session</button>
+<div class="sticky-actions">
+  <button class="btn btn-primary" id="saveBtn">Sauvegarder</button>
+  <button class="sticky-icon-btn" id="shareBtn" aria-label="Partager">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+  </button>
+  <button class="sticky-icon-btn" id="moreBtn" aria-label="Plus d'options">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><circle cx="12" cy="5" r="1.5" fill="#1A2B3D" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#1A2B3D" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="#1A2B3D" stroke="none"/></svg>
+  </button>
+</div>
+
+<div class="more-menu" id="moreMenu" style="display:none;">
+  <div class="more-menu-sheet">
+    <button class="more-menu-item" id="exportMenuBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Exporter en markdown
+    </button>
+    <button class="more-menu-item" id="newSessionMenuBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
+      Nouvelle réunion
+    </button>
+    <button class="more-menu-item danger" id="deleteMenuBtn" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#E8734A" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+      Supprimer cette session
+    </button>
+    <button class="more-menu-item" id="closeMenuBtn" style="color:var(--ink-soft); font-weight:600;">
+      Annuler
+    </button>
   </div>
 </div>
 

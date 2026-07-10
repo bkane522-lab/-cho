@@ -30,9 +30,9 @@ document.getElementById('sessionDate').textContent = Echo.formatDate(session.dat
 document.getElementById('summaryText').textContent = session.summary;
 
 if (isSaved) {
-  document.getElementById('saveBtn').textContent = 'Enregistré dans l\'historique ✓';
+  document.getElementById('saveBtn').textContent = 'Enregistré ✓';
   document.getElementById('saveBtn').disabled = true;
-  document.getElementById('deleteRow').style.display = 'block';
+  document.getElementById('deleteMenuBtn').style.display = 'flex';
 }
 
 let activeTab = 'tasks';
@@ -191,25 +191,10 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   Echo.clearPendingResult();
   isSaved = true;
   const btn = document.getElementById('saveBtn');
-  btn.textContent = 'Enregistré dans l\'historique ✓';
+  btn.textContent = 'Enregistré ✓';
   btn.disabled = true;
-  document.getElementById('deleteRow').style.display = 'block';
+  document.getElementById('deleteMenuBtn').style.display = 'flex';
   history.replaceState(null, '', `/review.html?id=${session.id}`);
-});
-
-document.getElementById('exportBtn').addEventListener('click', async () => {
-  try {
-    const resp = await fetch('/api/export', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(session)
-    });
-    const data = await resp.json();
-    const markdown = data.markdown || buildMarkdown();
-    downloadMarkdown(markdown);
-  } catch {
-    downloadMarkdown(buildMarkdown());
-  }
 });
 
 function downloadMarkdown(markdown) {
@@ -222,6 +207,20 @@ function downloadMarkdown(markdown) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+async function doExport() {
+  try {
+    const resp = await fetch('/api/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(session)
+    });
+    const data = await resp.json();
+    downloadMarkdown(data.markdown || buildMarkdown());
+  } catch {
+    downloadMarkdown(buildMarkdown());
+  }
 }
 
 document.getElementById('shareBtn').addEventListener('click', async () => {
@@ -240,7 +239,25 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   }
 });
 
-document.getElementById('deleteBtn')?.addEventListener('click', () => {
+// --- Menu "plus" (⋯) : exporter, nouvelle réunion, supprimer ---
+const moreMenu = document.getElementById('moreMenu');
+document.getElementById('moreBtn').addEventListener('click', () => {
+  moreMenu.style.display = 'flex';
+});
+document.getElementById('closeMenuBtn').addEventListener('click', () => {
+  moreMenu.style.display = 'none';
+});
+moreMenu.addEventListener('click', (e) => {
+  if (e.target === moreMenu) moreMenu.style.display = 'none';
+});
+document.getElementById('exportMenuBtn').addEventListener('click', () => {
+  moreMenu.style.display = 'none';
+  doExport();
+});
+document.getElementById('newSessionMenuBtn').addEventListener('click', () => {
+  location.href = '/record.html?mode=live';
+});
+document.getElementById('deleteMenuBtn').addEventListener('click', () => {
   if (confirm('Supprimer définitivement cette session ?')) {
     Echo.deleteSession(session.id);
     location.href = '/index.html';

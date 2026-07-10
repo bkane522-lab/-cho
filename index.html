@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Écho</title>
 <meta name="theme-color" content="#E8734A">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
@@ -34,20 +37,18 @@
     </button>
   </div>
   <div class="btn-row">
-    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+    <button class="btn btn-secondary btn-compact" onclick="document.getElementById('fileInput').click()">
       <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-      Importer un fichier audio
+      Importer
     </button>
-    <input type="file" id="fileInput" accept="audio/*">
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" onclick="location.href='/history.html'">
+    <button class="btn btn-secondary btn-compact" onclick="location.href='/history.html'">
       <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="#1A2B3D" stroke-width="2"><path d="M3 3v5h5M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
       Historique
     </button>
+    <input type="file" id="fileInput" accept="audio/*">
   </div>
 
-  <h2 style="font-size: 16px; margin: 24px 0 12px;">Sessions récentes</h2>
+  <h2 style="font-size: 15px; margin: 16px 0 10px;">Sessions récentes</h2>
   <div class="card" id="recentSessions"></div>
 </div>
 
